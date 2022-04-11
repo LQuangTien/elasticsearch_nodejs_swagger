@@ -10,8 +10,8 @@ app.use(cors());
 
 const getindicesData = require("../controllers/getIndexdata");
 const insertApi = require("../controllers/registration");
-// const updateApi = require('../controllers/userdetailsupdate');
-// const deleteApi = require('../controllers/deleteuserdetails');
+const updateApi = require("../controllers/userdetailsupdate");
+const deleteApi = require("../controllers/deleteuserdetails");
 
 //Testing
 app.get("/", async (req, res) => {
@@ -40,18 +40,15 @@ app.post("/search/single/data", getindicesData.getEachIndicesSingleRecord);
 app.post("/insert/single/data", insertApi.insertSingleData);
 
 // // Update single data into Elastic-search // indices students
-// app.put('/update/user/data', (req, res) => { //done if data is not there then insert new records if "doc_as_upsert" : true || if its false if record is not there then it will throw an error
-//    updateApi.updateSingleData(req, res);
-// });
+//done if data is not there then insert new records
+// if "doc_as_upsert" : true ||
+// if its false if record is not there then it will throw an error
+app.put("/update/single/data", updateApi.updateSingleData);
 
-// // Delete single data from Elastic-search // indices students
-// app.delete('/delete/user/data', (req, res) => {  //single and bulk
-//    deleteApi.deleteUserData(req, res);
-// });
+// Delete single data from Elastic-search // indices students
+app.delete("/delete/single/data", deleteApi.deleteSingleData);
 
-// // Delete indices from Elastic-search // indices students
-// app.delete('/delete/:index', (req, res) => { //done
-//    deleteApi.deleteElasticSearchIndex(req, res);
-// });
+// Delete indices from Elastic-search // indices students
+app.delete("/delete/:index", deleteApi.deleteElasticSearchIndex);
 
 module.exports = app;
