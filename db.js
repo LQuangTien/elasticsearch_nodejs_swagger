@@ -4,7 +4,7 @@ const client = new Client({
   node: config.elasticsearch.url + "" + config.elasticsearch.port,
   auth: {
     username: "elastic",
-    password: "123456",
+    password: "5BI5Ya6TzbBPzQ53AsYe",
   },
   tls: {
     // might be required if it's a self-signed certificate

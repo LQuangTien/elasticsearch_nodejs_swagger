@@ -1,0 +1,6 @@
+Set ~/.bashrc  with: sudo sysctl -w vm.max_map_count=262144
+docker run --name es01 --net elastic -p 9200:9200 -p 9300:9300 -e "bootstrap.memory_lock=true" --ulimit memlock=-1:-1 -d --restart unless-stopped  docker.elastic.co/elasticsearch/elasticsearch:8.0.0 
+docker run --name kib-01 --net elastic -p 5601:5601 -d --restart unless-stopped docker.elastic.co/kibana/kibana:8.0.0
+docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+docker exec -it kib-01 kibana-verification-code

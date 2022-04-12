@@ -51,6 +51,18 @@ app.get("/", async (req, res) => {
 /**
  * @swagger
  * paths:
+ *   /bulk/data:
+ *    get:
+ *      summary: Get all data of index
+ *      responses:
+ *        200:
+ *          description: Success
+ */
+ app.get("/bulk/data", insertApi.bulkData);
+
+/**
+ * @swagger
+ * paths:
  *   /search/alldata/{index}:
  *    get:
  *      summary: Get all data of index
