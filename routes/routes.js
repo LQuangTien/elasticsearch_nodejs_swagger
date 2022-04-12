@@ -58,7 +58,7 @@ app.get("/", async (req, res) => {
  *        200:
  *          description: Success
  */
- app.get("/bulk/data", insertApi.bulkData);
+app.get("/bulk/data", insertApi.bulkData);
 
 /**
  * @swagger
@@ -147,16 +147,103 @@ app.post("/search/single/data", getindicesData.getEachIndicesSingleRecord);
  */
 app.post("/insert/single/data", insertApi.insertSingleData);
 
-// // Update single data into Elastic-search // indices students
-//done if data is not there then insert new records
-// if "doc_as_upsert" : true ||
-// if its false if record is not there then it will throw an error
+/**
+ * @swagger
+ * /update/single/data:
+ *   put:
+ *     summary: Update a single data.
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *               type: object
+ *               properties:
+ *                 index:
+ *                   type: string
+ *                   example: blog
+ *                 id:
+ *                   type: string
+ *                   example: Bxt6F4ABDlrQx5DLjzR0
+ *                 title:
+ *                   type: string
+ *                   example: blog a
+ *                 content:
+ *                   type: string
+ *                   example: content a
+ *     responses:
+ *       200:
+ *         description: Updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 index:
+ *                   type: string
+ *                   example: blog
+ *                 id:
+ *                   type: string
+ *                   example: Bxt6F4ABDlrQx5DLjzR0
+ *                 title:
+ *                   type: string
+ *                   example: blog a
+ *                 content:
+ *                   type: string
+ *                   example: content a
+ */
 app.put("/update/single/data", updateApi.updateSingleData);
 
-// Delete single data from Elastic-search // indices students
+/**
+ * @swagger
+ * /delete/single/data:
+ *   delete:
+ *     summary: Delete a single data.
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *               type: object
+ *               properties:
+ *                 index:
+ *                   type: string
+ *                   example: blog
+ *                 id:
+ *                   type: string
+ *                   example: Bxt6F4ABDlrQx5DLjzR0
+ *     responses:
+ *       200:
+ *         description: Updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 index:
+ *                   type: string
+ *                   example: blog
+ *                 id:
+ *                   type: string
+ *                   example: Bxt6F4ABDlrQx5DLjzR0
+ */
 app.delete("/delete/single/data", deleteApi.deleteSingleData);
 
-// Delete indices from Elastic-search // indices students
+/**
+ * @swagger
+ * paths:
+ *   /delete/{index}:
+ *    delete:
+ *      summary: Delete index
+ *      parameters:
+ *        - in: path
+ *          name: index
+ *          schema:
+ *            type: string
+ *            required: true
+ *            description: index name
+ *      responses:
+ *        200:
+ *          description: Deleted
+ */
 app.delete("/delete/:index", deleteApi.deleteElasticSearchIndex);
 
 module.exports = app;

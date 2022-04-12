@@ -5,13 +5,9 @@ var elastic_client = require("../db");
 
 exports.deleteSingleData = function (req, res, next) {
   elastic_client
-    .deleteByQuery({
+    .delete({
       index: req.body.index,
-      body: {
-        query: {
-          match: { id: req.body.id },
-        },
-      },
+      id: req.body.id,
     })
     .then(
       function (response) {
@@ -35,7 +31,8 @@ exports.deleteElasticSearchIndex = function (req, res, next) {
       index: esIndexName, //delete all indices '_all'
     })
     .then(function (err, response) {
-      if (err) {
+      console.log({ err });
+      if (err.acknowledged !== true) {
         console.error(chalk.red(err.message));
         res.send({
           status: 403,
