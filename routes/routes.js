@@ -1,31 +1,17 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+const router = express.Router();
 const client = require("../db");
+const multer = require("multer");
 
-const swaggerJsDoc = require("swagger-jsdoc");
-const swaggerUI = require("swagger-ui-express");
-
-const swaggerOptions = {
-  swaggerDefinition: {
-    // info: { title: "Search engine API", version: "1.0.0" },
-    openapi: "3.0.0",
-    info: {
-      title: "Express API for JSONPlaceholder",
-      version: "1.0.0",
-    },
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads/");
   },
-  apis: ["./routes/routes.js"],
-};
-
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-
-const app = express();
-
-app.use(bodyParser.json());
-
-app.use(cors());
-app.use("/api", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+const upload = multer({ storage });
 
 const getindicesData = require("../controllers/getIndexdata");
 const insertApi = require("../controllers/registration");
@@ -33,7 +19,7 @@ const updateApi = require("../controllers/userdetailsupdate");
 const deleteApi = require("../controllers/deleteuserdetails");
 
 //Testing
-app.get("/", async (req, res) => {
+router.get("/", async (req, res) => {
   //done
   try {
     //  const result = await client.search({
@@ -58,7 +44,7 @@ app.get("/", async (req, res) => {
  *        200:
  *          description: Success
  */
-app.get("/bulk/data", insertApi.bulkData);
+router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 
 /**
  * @swagger
@@ -77,7 +63,7 @@ app.get("/bulk/data", insertApi.bulkData);
  *        200:
  *          description: Success
  */
-app.get("/search/alldata/:index", getindicesData.getEachIndicesData);
+router.get("/search/alldata/:index", getindicesData.getEachIndicesData);
 
 /**
  * @swagger
@@ -105,7 +91,7 @@ app.get("/search/alldata/:index", getindicesData.getEachIndicesData);
  *                          title: "blog",
  *                       }
  */
-app.post("/search/single/data", getindicesData.getEachIndicesSingleRecord);
+router.post("/search/single/data", getindicesData.getEachIndicesSingleRecord);
 
 /**
  * @swagger
@@ -145,7 +131,7 @@ app.post("/search/single/data", getindicesData.getEachIndicesSingleRecord);
  *                   type: string
  *                   example: content a
  */
-app.post("/insert/single/data", insertApi.insertSingleData);
+router.post("/insert/single/data", insertApi.insertSingleData);
 
 /**
  * @swagger
@@ -191,7 +177,7 @@ app.post("/insert/single/data", insertApi.insertSingleData);
  *                   type: string
  *                   example: content a
  */
-app.put("/update/single/data", updateApi.updateSingleData);
+router.put("/update/single/data", updateApi.updateSingleData);
 
 /**
  * @swagger
@@ -225,7 +211,7 @@ app.put("/update/single/data", updateApi.updateSingleData);
  *                   type: string
  *                   example: Bxt6F4ABDlrQx5DLjzR0
  */
-app.delete("/delete/single/data", deleteApi.deleteSingleData);
+router.delete("/delete/single/data", deleteApi.deleteSingleData);
 
 /**
  * @swagger
@@ -244,6 +230,6 @@ app.delete("/delete/single/data", deleteApi.deleteSingleData);
  *        200:
  *          description: Deleted
  */
-app.delete("/delete/:index", deleteApi.deleteElasticSearchIndex);
+router.delete("/delete/:index", deleteApi.deleteElasticSearchIndex);
 
-module.exports = app;
+module.exports = router;

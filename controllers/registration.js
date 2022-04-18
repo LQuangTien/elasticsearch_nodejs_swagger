@@ -1,3 +1,7 @@
+const jq = require("node-jq");
+const fs = require("fs");
+const path = require("path");
+
 const config = require("config");
 var elastic_client = require("../db");
 
@@ -5,7 +9,6 @@ const indexName = config.elasticsearch.elasticsearchIndices.STUDENTS.index;
 const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 
 exports.insertSingleData = function (req, res, next) {
-  
   elastic_client
     .index({
       index: req.body.index,
@@ -28,25 +31,166 @@ exports.insertSingleData = function (req, res, next) {
     });
 };
 
-exports.bulkData = function (req, res, next) {
-  elastic_client.bulk({
-      body: [
-          // action description
-          { index: { _index: 'blog', _id: 7 } },
-          // the document to index
-          { title: 'foo' },
-          // action description
-          { index: { _index: 'blog', _id: 8 } },
-          // the document to index
-          { title: 'foo1' },
-          // action description
-          { index: { _index: 'blog', _id: 9 } },
-          // the document to index
-          { title: 'foo2' },
-      ]
-  }, function (err, resp) {
-      console.log(err,resp)
-      res.status(200).send(resp);
-  });
+exports.bulkData = async function (req, res) {
+  // fs.readFile('../output.json', { encoding: 'utf-8' }, async function (err, data) {
+  //   if (!err) {
+  //     // console.log('data',test)
+  //     const bulkResponse = await elastic_client.bulk({ refresh: true, data })
 
+  //     if (bulkResponse.errors) {
+  //       const erroredDocuments = []
+  //       bulkResponse.items.forEach((action, i) => {
+  //         const operation = Object.keys(action)[0]
+  //         if (action[operation].error) {
+  //           erroredDocuments.push({
+  //             status: action[operation].status,
+  //             error: action[operation].error,
+  //             operation: body[i * 2],
+  //             document: body[i * 2 + 1]
+  //           })
+  //         }
+  //       })
+  //       console.log(erroredDocuments)
+  //     }
+
+  //     const count = await elastic_client.count({ index: 'blog' })
+  //     console.log(count)
+  //   } else {
+  //     console.log(err);
+  //   }
+  // });
+
+  const filter = `[.[] | {"index": {"_index": "${req.body.index}"}}, .]`;
+  const jsonPath = path.join(
+    __dirname,
+    "..",
+    `public/uploads/${req.file.filename}`
+  );
+  const options = {};
+
+  jq.run(filter, jsonPath, options)
+    .then(async (output) => {
+      output = JSON.parse(output);
+
+      const bulkResponse = await elastic_client.bulk({
+        refresh: true,
+        body: output,
+      });
+
+      if (bulkResponse.errors) {
+        const erroredDocuments = [];
+        bulkResponse.items.forEach((action, i) => {
+          const operation = Object.keys(action)[0];
+          if (action[operation].error) {
+            erroredDocuments.push({
+              status: action[operation].status,
+              error: action[operation].error,
+              operation: body[i * 2],
+              document: body[i * 2 + 1],
+            });
+          }
+        });
+        console.log(erroredDocuments);
+      }
+
+      const count = await elastic_client.count({ index: req.body.index });
+      fs.unlinkSync(jsonPath);
+      res.status(200).send({ count });
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
+
+function formatFileForBulkData(filePath) {
+  // const filter = '[.[] | {"index": {"_index": "blog"}}, .]'
+  // const jsonPath = 'test.json'
+  // const options = {}
+  // jq.run(filter, jsonPath, options)
+  //   .then((output) => {
+  //     fs.writeFile("../output.json", output, function (err) {
+  //       if (err) {
+  //         console.log(err);
+  //       }
+  //       console.log("The file was saved!");
+  //     });
+  //     console.log(output)
+  //   })
+  //   .catch((err) => {
+  //     console.error(err)
+  //     // Something went wrong...
+  //   })
+}
+
+function readFile(filePath) {
+  // to read json files
+  var fs = require("fs");
+  // Start reading the json file
+  fs.readFile("DocRes.json", { encoding: "utf-8" }, function (err, data) {
+    if (err) {
+      throw err;
+    }
+
+    // Build up a giant bulk request for elasticsearch.
+    bulk_request = data.split("\n").reduce(function (bulk_request, line) {
+      var obj, ncar;
+
+      try {
+        obj = JSON.parse(line);
+      } catch (e) {
+        console.log("Done reading 1");
+        return bulk_request;
+      }
+
+      // Rework the data slightly
+      ncar = {
+        id: obj.id,
+        name: obj.name,
+        summary: obj.summary,
+        image: obj.image,
+        approvetool: obj.approvetool,
+        num: obj.num,
+        date: obj.date,
+      };
+
+      bulk_request.push({
+        index: { _index: "ncar_index", _type: "ncar", _id: ncar.id },
+      });
+      bulk_request.push(ncar);
+      return bulk_request;
+    }, []);
+
+    // A little voodoo to simulate synchronous insert
+    var busy = false;
+    var callback = function (err, resp) {
+      if (err) {
+        console.log(err);
+      }
+
+      busy = false;
+    };
+
+    // Recursively whittle away at bulk_request, 1000 at a time.
+    var perhaps_insert = function () {
+      if (!busy) {
+        busy = true;
+        client.bulk(
+          {
+            body: bulk_request.slice(0, 1000),
+          },
+          callback
+        );
+        bulk_request = bulk_request.slice(1000);
+        console.log(bulk_request.length);
+      }
+
+      if (bulk_request.length > 0) {
+        setTimeout(perhaps_insert, 100);
+      } else {
+        console.log("Inserted all records.");
+      }
+    };
+
+    perhaps_insert();
+  });
 }
