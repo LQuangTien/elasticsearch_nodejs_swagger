@@ -17,7 +17,8 @@ const getindicesData = require("../controllers/getIndexdata");
 const insertApi = require("../controllers/registration");
 const updateApi = require("../controllers/userdetailsupdate");
 const deleteApi = require("../controllers/deleteuserdetails");
-
+const searchAPI =  require("../controllers/search");
+const aggregateAPI =  require("../controllers/aggregate"); 
 //Testing
 router.get("/", async (req, res) => {
   //done
@@ -44,7 +45,7 @@ router.get("/", async (req, res) => {
  *        200:
  *          description: Success
  */
-router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
+
 
 /**
  * @swagger
@@ -66,6 +67,7 @@ router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 router.get("/search/alldata/:index", getindicesData.getEachIndicesData);
 
 router.get("/getAllIndex", getindicesData.getAllIndex);
+
 
 /**
  * @swagger
@@ -214,6 +216,10 @@ router.put("/update/single/data", updateApi.updateSingleData);
  *                   example: Bxt6F4ABDlrQx5DLjzR0
  */
 router.delete("/delete/single/data", deleteApi.deleteSingleData);
+
+
+router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
+router.get("/search/match",searchAPI.match);
 
 /**
  * @swagger
