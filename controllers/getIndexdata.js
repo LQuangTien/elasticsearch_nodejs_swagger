@@ -1,10 +1,14 @@
 const config = require("config");
 var elastic_client = require("../db");
 
-const indexName = config.elasticsearch.elasticsearchIndices.STUDENTS.index;
-const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
+exports.getAllIndex = async function (req, res) {
+  const indices = await elastic_client.cat.indices({ format: "json" });
+  return res.status(200).send(indices);
+};
 
-exports.getEachIndicesData = function (req, res, next) {
+exports.getEachIndicesData = async function (req, res, next) {
+  const indices = await elastic_client.cat.indices({ format: "json" });
+  console.log("indices:", indices);
   elastic_client
     .search({
       index: req.params["index"],
