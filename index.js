@@ -3,6 +3,8 @@ const cors = require("cors");
 const config = require("config");
 const bodyParser = require("body-parser");
 const path = require("path");
+const env = require("dotenv");
+env.config();
 
 const port = process.env.PORT || config.application_serverport;
 
