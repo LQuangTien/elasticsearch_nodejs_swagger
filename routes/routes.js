@@ -65,6 +65,8 @@ router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
  */
 router.get("/search/alldata/:index", getindicesData.getEachIndicesData);
 
+router.get("/getAllIndex", getindicesData.getAllIndex);
+
 /**
  * @swagger
  * /search/single/data:
