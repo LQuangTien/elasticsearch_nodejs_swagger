@@ -66,6 +66,8 @@ router.get("/", async (req, res) => {
  */
 router.get("/search/alldata/:index", getindicesData.getEachIndicesData);
 
+router.get("/getAllIndex", getindicesData.getAllIndex);
+
 
 /**
  * @swagger
