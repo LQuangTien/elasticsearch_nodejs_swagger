@@ -68,6 +68,7 @@ exports.bulkData = async function (req, res) {
   );
   const options = {};
 
+
   jq.run(filter, jsonPath, options)
     .then(async (output) => {
       output = JSON.parse(output);
