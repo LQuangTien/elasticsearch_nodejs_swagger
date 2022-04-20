@@ -17,6 +17,7 @@ const getindicesData = require("../controllers/getIndexdata");
 const insertApi = require("../controllers/registration");
 const updateApi = require("../controllers/userdetailsupdate");
 const deleteApi = require("../controllers/deleteuserdetails");
+const indexAPI = require("../controllers/indexAPI");
 const searchAPI =  require("../controllers/search");
 const aggregateAPI =  require("../controllers/aggregate"); 
 //Testing
@@ -218,9 +219,12 @@ router.put("/update/single/data", updateApi.updateSingleData);
 router.delete("/delete/single/data", deleteApi.deleteSingleData);
 
 
+
 router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 router.get("/search/multiMatch",searchAPI.multiMatch);
 router.get("/search/categorizeField",searchAPI.categorizeField);
+router.get("/index/mapping/:index",indexAPI.getMapping);
+router.get("/index/create/:index",indexAPI.createIndex);
 
 /**
  * @swagger

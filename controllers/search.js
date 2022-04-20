@@ -12,12 +12,11 @@ const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 exports.multiMatch = async (req, res) => {
   //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
   try {
-    console.log("input", req.query.input, req.query.index);
     const result = await elastic_client.search({
       index: req.query.index,
       query: {
-        multi_match: {
-          query: req.query.input,
+        query_string: {
+          query: "*"+req.query.input+"*"
         },
       },
     });
@@ -45,3 +44,21 @@ exports.categorizeField = async (req, res) => {
     console.log("err", err.messages);
   }
 };
+
+// exports.multiMatch = async (req, res) => {
+//   //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
+//   try {
+//     console.log("input", req.query.input, req.query.index);
+//     const result = await elastic_client.search({
+//       index: req.query.index,
+//       query: {
+//         multi_match: {
+//           query: req.query.input,
+//         },
+//       },
+//     });
+//     res.status(200).send({ result });
+//   } catch (err) {
+//     console.log("err", err.messages);
+//   }
+// };
