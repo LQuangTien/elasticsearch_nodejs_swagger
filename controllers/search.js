@@ -12,6 +12,7 @@ const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 exports.multiMatch = async (req, res) => {
   //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
   try {
+    console.log("input", req.query.input, req.query.index, req.query.perPage);
     const result = await elastic_client.search({
       index: req.body.index,
       _source : {
