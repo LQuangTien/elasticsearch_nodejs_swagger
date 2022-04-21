@@ -13,10 +13,13 @@ exports.multiMatch = async (req, res) => {
   //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
   try {
     const result = await elastic_client.search({
-      index: req.query.index,
+      index: req.body.index,
+      _source : {
+        includes:req.body.includes
+      },
       query: {
         query_string: {
-          query: "*"+req.query.input+"*"
+          query: "*"+req.body.input+"*"
         },
       },
     });
