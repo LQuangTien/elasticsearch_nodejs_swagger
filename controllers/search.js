@@ -14,14 +14,13 @@ exports.multiMatch = async (req, res) => {
   try {
     console.log("input", req.query.input, req.query.index, req.query.perPage);
     const result = await elastic_client.search({
-      index: req.query.index,
-      body: {
-        from: 0,
-        size: req.query.perPage || 1000,
+      index: req.body.index,
+      _source : {
+        includes:req.body.includes
       },
       query: {
         query_string: {
-          query: "*"+req.query.input+"*"
+          query: "*"+req.body.input+"*"
         },
       },
     });
