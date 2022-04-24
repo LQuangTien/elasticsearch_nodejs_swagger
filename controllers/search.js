@@ -12,24 +12,35 @@ const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 //full-text search: match(có params là minimum_should_match: đơn vị phần trăm ,operator: and, mặc định k sài thì là or)
 exports.partialSearch = async (req, res) => {
   try {
-    console.log("input on spec field", req.body.index, typeof req.body.includes, req.body.input, req.params.perPage, req.params.page);
+    console.log(
+      "input on spec field",
+      req.body.index,
+      typeof req.body.includes,
+      req.body.input,
+      req.params.perPage,
+      req.params.page
+    );
     const query = {
       query_string: {
         query: "*" + req.body.input + "*",
         // fields: req.body.fields
-      }
+      },
     };
-    if (req.body.fields) query.query_string.fields = req.body.fields
+    if (req.body.fields) query.query_string.fields = req.body.fields;
     const result = await elastic_client.search({
       index: req.body.index,
       size: 10000,
-      // _source: {
-      //   includes: req.body.includes
-      // },
-      query
+      _source: {
+        includes: req.body.includes,
+      },
+      query,
     });
-    console.log("result on spec field", result.hits)
-    const formatResult = pagination(result.hits.hits, req.params.page, req.params.perPage)
+    console.log("result on spec field", result.hits);
+    const formatResult = pagination(
+      result.hits.hits,
+      req.params.page,
+      req.params.perPage
+    );
     // console.log("fuck2",test)
     res.status(200).send({ formatResult });
   } catch (err) {
