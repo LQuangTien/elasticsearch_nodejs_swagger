@@ -13,12 +13,12 @@ const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 exports.multiMatch = async (req, res) => {
   //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
   try {
-    console.log("input1", req.body.index,req.body.includes.split(','),req.body.input,req.params.perPage,req.params.page);
+    // console.log("input1", req.body.index,typeof req.body.includes,req.body.input,req.params.perPage,req.params.page);
     const result = await elastic_client.search({
       index: req.body.index,
       size:10000,
       _source: {
-        includes: req.body.includes.split(',')
+        includes: req.body.includes
       },
       query: {
         query_string: {
@@ -26,10 +26,10 @@ exports.multiMatch = async (req, res) => {
         },
       },
     }); 
-    console.log("fuck",result.hits)
-    const test = pagination(result.hits.hits, req.params.page, req.params.perPage)
-    console.log("fuck2",test)
-    res.status(200).send({ test });
+    // console.log("fuck",result.hits)
+    const formatResult = pagination(result.hits.hits, req.params.page, req.params.perPage)
+    // console.log("fuck2",test)
+    res.status(200).send({ formatResult });
   } catch (err) {
     console.log("err1", err.messages);
   }
