@@ -10,10 +10,10 @@ const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 
 //filter: term(find exact value, kiểm tra có contain term đó ko), terms, range, exists, missing, bool(combine must, must_not, should)
 //full-text search: match(có params là minimum_should_match: đơn vị phần trăm ,operator: and, mặc định k sài thì là or)
-exports.multiMatch = async (req, res) => {
+exports.searchOnAllField = async (req, res) => {
   //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
   try {
-    // console.log("input1", req.body.index,typeof req.body.includes,req.body.input,req.params.perPage,req.params.page);
+    console.log("input search on all field", req.body.index,typeof req.body.includes,req.body.input,req.params.perPage,req.params.page);
     const result = await elastic_client.search({
       index: req.body.index,
       size:10000,
@@ -26,7 +26,32 @@ exports.multiMatch = async (req, res) => {
         },
       },
     }); 
-    // console.log("fuck",result.hits)
+    console.log("result on all field",result.hits)
+    const formatResult = pagination(result.hits.hits, req.params.page, req.params.perPage)
+    // console.log("fuck2",test)
+    res.status(200).send({ formatResult });
+  } catch (err) {
+    console.log("err1", err.messages);
+  }
+};
+
+exports.searchOnSpecificField = async (req, res) => {
+  try {
+    console.log("input on spec field", req.body.index,typeof req.body.includes,req.body.input,req.params.perPage,req.params.page);
+    const result = await elastic_client.search({
+      index: req.body.index,
+      size:10000,
+      // _source: {
+      //   includes: req.body.includes
+      // },
+      query: {
+        query_string: {
+         query:"*"+req.body.input+"*",
+         fields:req.body.fields
+        },
+      },
+    }); 
+    console.log("result on spec field",result.hits)
     const formatResult = pagination(result.hits.hits, req.params.page, req.params.perPage)
     // console.log("fuck2",test)
     res.status(200).send({ formatResult });
