@@ -221,7 +221,8 @@ router.delete("/delete/single/data", deleteApi.deleteSingleData);
 
 
 router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
-router.post("/search/multiMatch/:page/:perPage",searchAPI.multiMatch);
+router.post("/search/searchOnAllField/:page/:perPage",searchAPI.searchOnAllField);
+router.post("/search/searchOnSpecificField/:page/:perPage",searchAPI.searchOnSpecificField)
 router.get("/search/categorizeField",searchAPI.categorizeField);
 router.get("/index/mapping/:index",indexAPI.getMapping);
 router.get("/index/create/:index",indexAPI.createIndex);
