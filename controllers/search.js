@@ -16,6 +16,7 @@ exports.multiMatch = async (req, res) => {
     console.log("input1", req.body.index,req.body.includes.split(','),req.body.input,req.params.perPage,req.params.page);
     const result = await elastic_client.search({
       index: req.body.index,
+      size:10000,
       _source: {
         includes: req.body.includes.split(',')
       },
@@ -25,8 +26,9 @@ exports.multiMatch = async (req, res) => {
         },
       },
     }); 
-    console.log("fuck",result.hits.hits)
+    console.log("fuck",result.hits)
     const test = pagination(result.hits.hits, req.params.page, req.params.perPage)
+    console.log("fuck2",test)
     res.status(200).send({ test });
   } catch (err) {
     console.log("err1", err.messages);
