@@ -24,8 +24,8 @@ app.use(express.static("public"));
 // });
 
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.json({ limit: "1000mb" }));
+app.use(bodyParser.urlencoded({ extended: false, limit: "1000mb" }));
 
 const server = require("http").createServer(app);
 const apiRoutes = require("./routes/routes");

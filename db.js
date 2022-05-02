@@ -10,5 +10,6 @@ const client = new Client({
     // might be required if it's a self-signed certificate
     rejectUnauthorized: false,
   },
+  requestTimeout: 9999999,
 });
 module.exports = client;
