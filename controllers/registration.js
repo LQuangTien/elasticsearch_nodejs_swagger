@@ -59,7 +59,7 @@ exports.bulkData = async function (req, res) {
   //     console.log(err);
   //   }
   // });
-
+  console.log(JSON.parse(req.body.mapping));
   const filter = `[.[] | {"index": {"_index": "${req.body.index}"}}, .]`;
   const jsonPath = path.join(
     __dirname,
@@ -67,7 +67,6 @@ exports.bulkData = async function (req, res) {
     `public/uploads/${req.file.filename}`
   );
   const options = {};
-
 
   jq.run(filter, jsonPath, options)
     .then(async (output) => {
