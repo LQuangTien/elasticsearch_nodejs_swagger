@@ -20,22 +20,27 @@ exports.partialSearch = async (req, res) => {
       req.params.perPage,
       req.params.page
     );
-    const query = {
-      query_string: {
-        query: "*" + req.body.input + "*",
-        // fields: req.body.fields
-      },
-    };
-    if (req.body.fields) query.query_string.fields = req.body.fields;
-    const result = await elastic_client.search({
+    const searchParams = {
       index: req.body.index,
       size: 10000,
-      // _source: {
-      //   includes: req.body.includes
-      // },
-      sort:[{"Age":{"order":"desc"}}],
-      query
-    });
+      _source: {
+        includes: req.body.includes,
+      },
+      // sort:[{"ten_field":{"order":"desc hoac asc"}}],
+      query: {
+        query_string: { 
+          query: Number.isInteger(req.body.input) ? req.body.input : "*" + req.body.input + "*",
+          // fields: req.body.fields
+        }
+      }
+    };
+    searchParams
+      && (searchParams.sort = req.body.sort)
+      && (searchParams.query.query_string.fields = req.body.fields)
+    // if (req.body.sort) searchParams.sort = req.body.sort;
+    // if (req.body.fields) searchParams.query.query_string.fields = req.body.fields;
+
+    const result = await elastic_client.search(searchParams);
     console.log("result on spec field", result.hits);
     const formatResult = pagination(
       result.hits.hits,

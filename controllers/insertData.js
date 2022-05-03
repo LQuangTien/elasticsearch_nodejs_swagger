@@ -32,75 +32,64 @@ exports.insertSingleData = function (req, res, next) {
 };
 
 exports.bulkData = async function (req, res) {
-  // fs.readFile('../output.json', { encoding: 'utf-8' }, async function (err, data) {
-  //   if (!err) {
-  //     // console.log('data',test)
-  //     const bulkResponse = await elastic_client.bulk({ refresh: true, data })
+  try {
+    if (req.body.mapping) {
+      const result = await elastic_client.indices.create({
+        index: req.body.index,
+        // operations: {
+        mappings: {
+          properties:  JSON.parse(req.body.mapping)
+        }
+        // }
+      });
+    }
 
-  //     if (bulkResponse.errors) {
-  //       const erroredDocuments = []
-  //       bulkResponse.items.forEach((action, i) => {
-  //         const operation = Object.keys(action)[0]
-  //         if (action[operation].error) {
-  //           erroredDocuments.push({
-  //             status: action[operation].status,
-  //             error: action[operation].error,
-  //             operation: body[i * 2],
-  //             document: body[i * 2 + 1]
-  //           })
-  //         }
-  //       })
-  //       console.log(erroredDocuments)
-  //     }
+    const filter = `[.[] | {"index": {"_index": "${req.body.index}"}}, .]`;
+    const jsonPath = path.join(
+      __dirname,
+      "..",
+      `public/uploads/${req.file.filename}`
+    );
+    const options = {};
 
-  //     const count = await elastic_client.count({ index: 'blog' })
-  //     console.log(count)
-  //   } else {
-  //     console.log(err);
-  //   }
-  // });
-  console.log(JSON.parse(req.body.mapping));
-  const filter = `[.[] | {"index": {"_index": "${req.body.index}"}}, .]`;
-  const jsonPath = path.join(
-    __dirname,
-    "..",
-    `public/uploads/${req.file.filename}`
-  );
-  const options = {};
+    jq.run(filter, jsonPath, options)
+      .then(async (output) => {
+        output = JSON.parse(output);
 
-  jq.run(filter, jsonPath, options)
-    .then(async (output) => {
-      output = JSON.parse(output);
+        console.log(output)
+        const bulkResponse = await elastic_client.bulk({
+          refresh: true,
+          body: output,
+        });
 
-      console.log(output)
-      const bulkResponse = await elastic_client.bulk({
-        refresh: true,
-        body: output,
+        // if (bulkResponse.errors) {
+        //   const erroredDocuments = [];
+        //   bulkResponse.items.forEach((action, i) => {
+        //     const operation = Object.keys(action)[0];
+        //     if (action[operation].error) {
+        //       erroredDocuments.push({
+        //         status: action[operation].status,
+        //         error: action[operation].error,
+        //         operation: body[i * 2],
+        //         document: body[i * 2 + 1],
+        //       });
+        //     }
+        //   });
+        //   console.log(erroredDocuments);
+        // }
+
+        const count = await elastic_client.count({ index: req.body.index });
+        fs.unlinkSync(jsonPath);
+        res.status(200).send({ count });
+      })
+      .catch((err) => {
+        console.error(err);
       });
 
-      // if (bulkResponse.errors) {
-      //   const erroredDocuments = [];
-      //   bulkResponse.items.forEach((action, i) => {
-      //     const operation = Object.keys(action)[0];
-      //     if (action[operation].error) {
-      //       erroredDocuments.push({
-      //         status: action[operation].status,
-      //         error: action[operation].error,
-      //         operation: body[i * 2],
-      //         document: body[i * 2 + 1],
-      //       });
-      //     }
-      //   });
-      //   console.log(erroredDocuments);
-      // }
-
-      const count = await elastic_client.count({ index: req.body.index });
-      fs.unlinkSync(jsonPath);
-      res.status(200).send({ count });
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+    res.status(200).send({ result })
+  } catch (err) {
+    console.log(err)
+  }
 };
 
 function formatFileForBulkData(filePath) {

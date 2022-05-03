@@ -21,34 +21,28 @@ exports.getMapping = async (req, res) => {
   }
 };
 
-exports.createIndex = async (req, res) => {
-  try {
-    const test = {
-      index: req.params.index,
-      operations: {
-        mappings: {
-          properties: req.body
-        }
-      }
-    }
-    console.log("test create index",test.operations.mappings);
+// exports.createIndex = async (req, res) => {
+//   try {
+//     console.log(JSON.parse(req.body.mapping));
 
-    const result = await elastic_client.indices.create({
-      index: req.params.index,
-      // operations: {
-        mappings: {
-          properties: req.body
-        }
-      // }
-    });
+//     const result = await elastic_client.indices.create({
+//       index: req.params.index,
+//       // operations: {
+//         mappings: {
+//           properties: JSON.parse(req.body.mapping)
+//         }
+//       // }
+//     });
 
-    res.status(200).send({ result })
-  } catch(err) {
-    console.log(err)
-  }
-    // res.status(200).send({ result });
+//     res.status(200).send({ result })
+//   } catch(err) {
+//     console.log(err)
+//   }
+//     // res.status(200).send({ result });
 
-};
+// };
+
+
 /*
 {
             id: { type: 'integer' },
