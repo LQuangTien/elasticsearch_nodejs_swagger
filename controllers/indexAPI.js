@@ -11,13 +11,16 @@ var elastic_client = require("../db");
 exports.getMapping = async (req, res) => {
   try {
     console.log("input", req.params.index);
-    const result = await elastic_client.indices.getMapping({index:req.params.index});
+    const result = await elastic_client.indices.getMapping({
+      index: req.params.index,
+    });
 
-    console.log(result.blog.mappings.properties)
-    const allFieldOfIndex = Object.keys(result[req.params.index].mappings.properties);
+    const allFieldOfIndex = Object.keys(
+      result[req.params.index].mappings.properties
+    );
     res.status(200).send({ allFieldOfIndex });
   } catch (err) {
-    console.log("err", err.messages);
+    console.log("err", err);
   }
 };
 
@@ -41,7 +44,6 @@ exports.getMapping = async (req, res) => {
 //     // res.status(200).send({ result });
 
 // };
-
 
 /*
 {

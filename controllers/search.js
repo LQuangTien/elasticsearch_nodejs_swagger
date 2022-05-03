@@ -12,14 +12,7 @@ const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 //full-text search: match(có params là minimum_should_match: đơn vị phần trăm ,operator: and, mặc định k sài thì là or)
 exports.partialSearch = async (req, res) => {
   try {
-    console.log(
-      "input on spec field",
-      req.body.index,
-      typeof req.body.includes,
-      req.body.input,
-      req.params.perPage,
-      req.params.page
-    );
+    console.log("input on spec field", req.body.sort);
     const searchParams = {
       index: req.body.index,
       size: 10000,
@@ -28,17 +21,20 @@ exports.partialSearch = async (req, res) => {
       },
       // sort:[{"ten_field":{"order":"desc hoac asc"}}],
       query: {
-        query_string: { 
-          query: Number.isInteger(req.body.input) ? req.body.input : "*" + req.body.input + "*",
+        query_string: {
+          query: Number.isInteger(req.body.input)
+            ? req.body.input
+            : "*" + req.body.input + "*",
           // fields: req.body.fields
-        }
-      }
+        },
+      },
     };
-    searchParams
-      && (searchParams.sort = req.body.sort)
-      && (searchParams.query.query_string.fields = req.body.fields)
+    searchParams &&
+      (searchParams.sort = req.body.sort) &&
+      (searchParams.query.query_string.fields = req.body.fields);
     // if (req.body.sort) searchParams.sort = req.body.sort;
-    // if (req.body.fields) searchParams.query.query_string.fields = req.body.fields;
+    // if (req.body.fields)
+    //   searchParams.query.query_string.fields = req.body.fields;
 
     const result = await elastic_client.search(searchParams);
     console.log("result on spec field", result.hits);
