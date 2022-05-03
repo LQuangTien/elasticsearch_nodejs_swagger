@@ -30,10 +30,11 @@ exports.partialSearch = async (req, res) => {
     const result = await elastic_client.search({
       index: req.body.index,
       size: 10000,
-      _source: {
-        includes: req.body.includes,
-      },
-      query,
+      // _source: {
+      //   includes: req.body.includes
+      // },
+      sort:[{"Age":{"order":"desc"}}],
+      query
     });
     console.log("result on spec field", result.hits);
     const formatResult = pagination(
@@ -44,12 +45,11 @@ exports.partialSearch = async (req, res) => {
     // console.log("fuck2",test)
     res.status(200).send({ formatResult });
   } catch (err) {
-    console.log("err1", err.messages);
+    console.log("err1", err);
   }
 };
 
 exports.categorizeField = async (req, res) => {
-  //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
   try {
     console.log("input", req.query.fieldName);
     const result = await elastic_client.search({

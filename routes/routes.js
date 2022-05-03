@@ -224,10 +224,10 @@ router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 router.post("/search/partialSearch/:page/:perPage",searchAPI.partialSearch);
 router.get("/search/categorizeField",searchAPI.categorizeField);
 router.get("/index/mapping/:index",indexAPI.getMapping);
-router.get("/index/create/:index",indexAPI.createIndex);
+router.post("/index/create/:index",indexAPI.createIndex);
 
 /**
- * @swagger
+ * @swagger 
  * paths:
  *   /delete/{index}:
  *    delete:

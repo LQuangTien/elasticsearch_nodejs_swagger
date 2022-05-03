@@ -72,26 +72,27 @@ exports.bulkData = async function (req, res) {
     .then(async (output) => {
       output = JSON.parse(output);
 
+      console.log(output)
       const bulkResponse = await elastic_client.bulk({
         refresh: true,
         body: output,
       });
 
-      if (bulkResponse.errors) {
-        const erroredDocuments = [];
-        bulkResponse.items.forEach((action, i) => {
-          const operation = Object.keys(action)[0];
-          if (action[operation].error) {
-            erroredDocuments.push({
-              status: action[operation].status,
-              error: action[operation].error,
-              operation: body[i * 2],
-              document: body[i * 2 + 1],
-            });
-          }
-        });
-        console.log(erroredDocuments);
-      }
+      // if (bulkResponse.errors) {
+      //   const erroredDocuments = [];
+      //   bulkResponse.items.forEach((action, i) => {
+      //     const operation = Object.keys(action)[0];
+      //     if (action[operation].error) {
+      //       erroredDocuments.push({
+      //         status: action[operation].status,
+      //         error: action[operation].error,
+      //         operation: body[i * 2],
+      //         document: body[i * 2 + 1],
+      //       });
+      //     }
+      //   });
+      //   console.log(erroredDocuments);
+      // }
 
       const count = await elastic_client.count({ index: req.body.index });
       fs.unlinkSync(jsonPath);
@@ -194,3 +195,6 @@ function readFile(filePath) {
     perhaps_insert();
   });
 }
+
+
+
