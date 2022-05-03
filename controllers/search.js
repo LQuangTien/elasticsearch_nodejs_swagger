@@ -20,21 +20,27 @@ exports.partialSearch = async (req, res) => {
       req.params.perPage,
       req.params.page
     );
-    const query = {
-      query_string: {
-        query: "*" + req.body.input + "*",
-        // fields: req.body.fields
-      },
-    };
-    if (req.body.fields) query.query_string.fields = req.body.fields;
-    const result = await elastic_client.search({
+    const searchParams = {
       index: req.body.index,
       size: 10000,
       _source: {
         includes: req.body.includes,
       },
-      query,
-    });
+      // sort:[{"ten_field":{"order":"desc hoac asc"}}],
+      query: {
+        query_string: { 
+          query: Number.isInteger(req.body.input) ? req.body.input : "*" + req.body.input + "*",
+          // fields: req.body.fields
+        }
+      }
+    };
+    searchParams
+      && (searchParams.sort = req.body.sort)
+      && (searchParams.query.query_string.fields = req.body.fields)
+    // if (req.body.sort) searchParams.sort = req.body.sort;
+    // if (req.body.fields) searchParams.query.query_string.fields = req.body.fields;
+
+    const result = await elastic_client.search(searchParams);
     console.log("result on spec field", result.hits);
     const formatResult = pagination(
       result.hits.hits,
@@ -44,12 +50,11 @@ exports.partialSearch = async (req, res) => {
     // console.log("fuck2",test)
     res.status(200).send({ formatResult });
   } catch (err) {
-    console.log("err1", err.messages);
+    console.log("err1", err);
   }
 };
 
 exports.categorizeField = async (req, res) => {
-  //Tìm data chứa 1 hoặc n chữ có trong input, sẽ sort theo relevance score, nào cao xếp trên
   try {
     console.log("input", req.query.fieldName);
     const result = await elastic_client.search({

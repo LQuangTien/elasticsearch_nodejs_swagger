@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const getindicesData = require("../controllers/getIndexdata");
-const insertApi = require("../controllers/registration");
+const insertApi = require("../controllers/insertData");
 const updateApi = require("../controllers/userdetailsupdate");
 const deleteApi = require("../controllers/deleteuserdetails");
 const indexAPI = require("../controllers/indexAPI");
@@ -224,10 +224,10 @@ router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 router.post("/search/partialSearch/:page/:perPage",searchAPI.partialSearch);
 router.get("/search/categorizeField",searchAPI.categorizeField);
 router.get("/index/mapping/:index",indexAPI.getMapping);
-router.get("/index/create/:index",indexAPI.createIndex);
+// router.post("/index/create/:index",indexAPI.createIndex);
 
 /**
- * @swagger
+ * @swagger 
  * paths:
  *   /delete/{index}:
  *    delete:
