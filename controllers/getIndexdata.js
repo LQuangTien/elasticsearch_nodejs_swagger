@@ -26,7 +26,7 @@ exports.getEachIndicesData = async function (req, res, next) {
         res.status(200).send(hits);
       },
       function (error) {
-        console.trace(error.message);
+        res.status(400).send({ message: "Index not found" });
       }
     )
     .catch((err) => {

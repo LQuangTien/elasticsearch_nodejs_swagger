@@ -29,12 +29,12 @@ exports.partialSearch = async (req, res) => {
         },
       },
     };
-    searchParams &&
-      (searchParams.sort = req.body.sort) &&
-      (searchParams.query.query_string.fields = req.body.fields);
-    // if (req.body.sort) searchParams.sort = req.body.sort;
-    // if (req.body.fields)
-    //   searchParams.query.query_string.fields = req.body.fields;
+    // searchParams &&
+    //   (searchParams.sort = req.body.sort) &&
+    //   (searchParams.query.query_string.fields = req.body.fields);
+    if (req.body.sort) searchParams.sort = req.body.sort;
+    if (req.body.fields)
+      searchParams.query.query_string.fields = req.body.fields;
 
     const result = await elastic_client.search(searchParams);
     console.log("result on spec field", result.hits);
