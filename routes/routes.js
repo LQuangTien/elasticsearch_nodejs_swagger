@@ -219,7 +219,7 @@ router.put("/update/single/data", updateApi.updateSingleData);
 router.delete("/delete/single/data", deleteApi.deleteSingleData);
 
 
-
+router.post("/bulk/new-data/",upload.single("dataFile"), insertApi.newData);
 router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 router.post("/search/partialSearch/:page/:perPage",searchAPI.partialSearch);
 router.get("/search/categorizeField",searchAPI.categorizeField);
