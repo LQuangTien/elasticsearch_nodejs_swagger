@@ -31,6 +31,71 @@ exports.insertSingleData = function (req, res, next) {
     });
 };
 
+exports.newData = async function (req, res) {
+  try {
+    const isExisted = elastic_client.indices.exists(req.body.index);
+    if(isExisted) res.status(400).send("Index has been existed");
+    
+    if (req.body.mapping) {
+      const result = await elastic_client.indices.create({
+        index: req.body.index,
+        // operations: {
+        mappings: {
+          properties: JSON.parse(req.body.mapping)
+        }
+        // }
+      });
+    }
+
+    const filter = `[.[] | {"index": {"_index": "${req.body.index}"}}, .]`;
+    const jsonPath = path.join(
+      __dirname,
+      "..",
+      `public/uploads/${req.file.filename}`
+    );
+    const options = {};
+
+    jq.run(filter, jsonPath, options)
+      .then(async (output) => {
+        output = JSON.parse(output);
+
+        console.log(output)
+        const bulkResponse = await elastic_client.bulk({
+          refresh: true,
+          body: output,
+        });
+
+        // if (bulkResponse.errors) {
+        //   const erroredDocuments = [];
+        //   bulkResponse.items.forEach((action, i) => {
+        //     const operation = Object.keys(action)[0];
+        //     if (action[operation].error) {
+        //       erroredDocuments.push({
+        //         status: action[operation].status,
+        //         error: action[operation].error,
+        //         operation: body[i * 2],
+        //         document: body[i * 2 + 1],
+        //       });
+        //     }
+        //   });
+        //   console.log(erroredDocuments);
+        // }
+
+        const count = await elastic_client.count({ index: req.body.index });
+        fs.unlinkSync(jsonPath);
+        res.status(200).send({ count });
+      })
+      // .catch((err) => {
+      //   if (err.meta.statusCode==='400') res.status(400).send("Index has been existed")
+      // });
+
+    res.status(200).send({ result })
+  } catch (err) {
+    console.log(err);
+    
+  }
+};
+
 exports.bulkData = async function (req, res) {
   try {
     if (req.body.mapping) {
@@ -38,7 +103,7 @@ exports.bulkData = async function (req, res) {
         index: req.body.index,
         // operations: {
         mappings: {
-          properties:  JSON.parse(req.body.mapping)
+          properties: JSON.parse(req.body.mapping)
         }
         // }
       });
@@ -84,6 +149,7 @@ exports.bulkData = async function (req, res) {
       })
       .catch((err) => {
         console.error(err);
+        // res.status(400).send("index has been existed")
       });
 
     res.status(200).send({ result })

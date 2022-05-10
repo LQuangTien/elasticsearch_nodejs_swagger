@@ -8,6 +8,7 @@ var elastic_client = require("../db");
 const indexName = config.elasticsearch.elasticsearchIndices.STUDENTS.index;
 const indexType = config.elasticsearch.elasticsearchIndices.STUDENTS.type;
 
+//exact value: numbers, dates, booleans, keyword
 //filter: term(find exact value, kiểm tra có contain term đó ko), terms, range, exists, missing, bool(combine must, must_not, should)
 //full-text search: match(có params là minimum_should_match: đơn vị phần trăm ,operator: and, mặc định k sài thì là or)
 exports.partialSearch = async (req, res) => {
@@ -37,6 +38,83 @@ exports.partialSearch = async (req, res) => {
       searchParams.query.query_string.fields = req.body.fields;
 
     const result = await elastic_client.search(searchParams);
+    console.log("result on spec field", result.hits);
+    const formatResult = pagination(
+      result.hits.hits,
+      req.params.page,
+      req.params.perPage
+    );
+    // console.log("fuck2",test)
+    res.status(200).send({ formatResult });
+  } catch (err) {
+    console.log("err1", err);
+  }
+};
+
+exports.termsFilter = async (req, res) => {
+  try {
+    const result = await elastic_client.search({
+      query:{
+        filter: {
+          terms : {
+            [req.body.fieldName]:req.body.listValue
+          }
+        }
+      }
+    });
+    console.log("result on spec field", result.hits);
+    const formatResult = pagination(
+      result.hits.hits,
+      req.params.page,
+      req.params.perPage
+    );
+    // console.log("fuck2",test)
+    res.status(200).send({ formatResult });
+  } catch (err) {
+    console.log("err1", err);
+  }
+};
+
+exports.rangeFilter = async (req, res) => {
+  try {
+    const result = await elastic_client.search({
+      query:{
+        filtered:{
+          filter: {
+            range : {
+              [req.body.fieldName]:{
+                gte:req.body.belowValue,
+                lt:req.body.upperValue
+              }
+            }
+          }
+        }
+      }
+    });
+    console.log("result on spec field", result.hits);
+    const formatResult = pagination(
+      result.hits.hits,
+      req.params.page,
+      req.params.perPage
+    );
+    // console.log("fuck2",test)
+    res.status(200).send({ formatResult });
+  } catch (err) {
+    console.log("err1", err);
+  }
+};
+
+exports.sortableField = async (req, res) => {
+  try {
+    const result = await elastic_client.search({
+      query:{
+        filter: {
+          terms : {
+            [req.body.fieldName]:req.body.listValue
+          }
+        }
+      }
+    });
     console.log("result on spec field", result.hits);
     const formatResult = pagination(
       result.hits.hits,
