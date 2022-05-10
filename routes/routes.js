@@ -18,8 +18,8 @@ const insertApi = require("../controllers/insertData");
 const updateApi = require("../controllers/userdetailsupdate");
 const deleteApi = require("../controllers/deleteuserdetails");
 const indexAPI = require("../controllers/indexAPI");
-const searchAPI =  require("../controllers/search");
-const aggregateAPI =  require("../controllers/aggregate"); 
+const searchAPI = require("../controllers/search");
+const aggregateAPI = require("../controllers/aggregate");
 //Testing
 router.get("/", async (req, res) => {
   //done
@@ -39,15 +39,58 @@ router.get("/", async (req, res) => {
 /**
  * @swagger
  * paths:
- *   /bulk/data:
+ *   /search/alldata/{index}:
+ *    get:
+ *      summary: Get all data of index
+ *      parameters:
+ *        - in: path
+ *          name: index
+ *          schema:
+ *            type: string
+ *            required: true
+ *            description: index name
+ *      responses:
+ *        200:
+ *          description: Success
+ *        400:
+ *          description: Index not found
+ */
+router.get("/search/alldata/:index", getindicesData.getEachIndicesData);
+
+/**
+ * @swagger
+ * paths:
+ *   /getAllIndex:
  *    get:
  *      summary: Get all data of index
  *      responses:
  *        200:
  *          description: Success
  */
+router.get("/getAllIndex", getindicesData.getAllIndex);
 
-
+/**
+ * @swagger
+ * /bulk/data:
+ *   post:
+ *     summary: Add a single data.
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *               type: object
+ *               properties:
+ *                 index:
+ *                   type: string
+ *                   example: blog
+ *                 dataFile:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 /**
  * @swagger
  * paths:
@@ -64,14 +107,51 @@ router.get("/", async (req, res) => {
  *      responses:
  *        200:
  *          description: Success
+ *        400:
+ *          description: Index not found
  */
-router.get("/search/alldata/:index", getindicesData.getEachIndicesData);
-
-router.get("/getAllIndex", getindicesData.getAllIndex);
-
-
+router.post("/search/partialSearch/:page/:perPage", searchAPI.partialSearch);
 /**
  * @swagger
+ * paths:
+ *   /index/mapping/{index}:
+ *    get:
+ *      summary: Get fields of index
+ *      parameters:
+ *        - in: path
+ *          name: index
+ *          schema:
+ *            type: string
+ *            required: true
+ *            description: index name
+ *      responses:
+ *        200:
+ *          description: Success
+ *        400:
+ *          description: Index not found
+ */
+router.get("/index/mapping/:index", indexAPI.getMapping);
+/**
+ * @swagger
+ * paths:
+ *   /delete/{index}:
+ *    delete:
+ *      summary: Delete index
+ *      parameters:
+ *        - in: path
+ *          name: index
+ *          schema:
+ *            type: string
+ *            required: true
+ *            description: index name
+ *      responses:
+ *        200:
+ *          description: Deleted
+ */
+router.delete("/delete/:index", deleteApi.deleteElasticSearchIndex);
+
+/**
+ * swagger
  * /search/single/data:
  *   post:
  *     summary: Search a document by query.
@@ -99,7 +179,7 @@ router.get("/getAllIndex", getindicesData.getAllIndex);
 router.post("/search/single/data", getindicesData.getEachIndicesSingleRecord);
 
 /**
- * @swagger
+ * swagger
  * /insert/single/data:
  *   post:
  *     summary: Add a single data.
@@ -139,7 +219,7 @@ router.post("/search/single/data", getindicesData.getEachIndicesSingleRecord);
 router.post("/insert/single/data", insertApi.insertSingleData);
 
 /**
- * @swagger
+ * swagger
  * /update/single/data:
  *   put:
  *     summary: Update a single data.
@@ -185,7 +265,7 @@ router.post("/insert/single/data", insertApi.insertSingleData);
 router.put("/update/single/data", updateApi.updateSingleData);
 
 /**
- * @swagger
+ * swagger
  * /delete/single/data:
  *   delete:
  *     summary: Delete a single data.
@@ -224,25 +304,7 @@ router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 router.post("/search/partialSearch/:page/:perPage",searchAPI.partialSearch);
 router.get("/search/categorizeField",searchAPI.categorizeField);
 router.get("/index/mapping/:index",indexAPI.getMapping);
-// router.post("/index/create/:index",indexAPI.createIndex);
 
-/**
- * @swagger 
- * paths:
- *   /delete/{index}:
- *    delete:
- *      summary: Delete index
- *      parameters:
- *        - in: path
- *          name: index
- *          schema:
- *            type: string
- *            required: true
- *            description: index name
- *      responses:
- *        200:
- *          description: Deleted
- */
-router.delete("/delete/:index", deleteApi.deleteElasticSearchIndex);
+// router.post("/index/create/:index",indexAPI.createIndex);
 
 module.exports = router;

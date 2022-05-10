@@ -6,6 +6,23 @@ const path = require("path");
 const env = require("dotenv");
 env.config();
 
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    // info: { title: "Search engine API", version: "1.0.0" },
+    openapi: "3.0.0",
+    info: {
+      title: "Express API for JSONPlaceholder",
+      version: "1.0.0",
+    },
+  },
+  apis: ["./routes/routes.js"],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
 const port = process.env.PORT || config.application_serverport;
 
 const elasticsearch = require("./db.js");
@@ -29,6 +46,7 @@ app.use(bodyParser.urlencoded({ extended: false, limit: "1000mb" }));
 
 const server = require("http").createServer(app);
 const apiRoutes = require("./routes/routes");
+app.use("/api", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 app.use("", apiRoutes);
 
