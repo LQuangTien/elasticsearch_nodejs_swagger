@@ -73,7 +73,7 @@ router.get("/getAllIndex", getindicesData.getAllIndex);
  * @swagger
  * /bulk/data:
  *   post:
- *     summary: Add a single data.
+ *     summary: Bulk update existed index.
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -91,6 +91,32 @@ router.get("/getAllIndex", getindicesData.getAllIndex);
  *         description: Success
  */
 router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
+
+/**
+ * @swagger
+ * /bulk/new-data:
+ *   post:
+ *     summary: Add new index with data.
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *               type: object
+ *               properties:
+ *                 index:
+ *                   type: string
+ *                   example: blog
+ *                 dataFile:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: Fail
+ */
+router.post("/bulk/new-data", upload.single("dataFile"), insertApi.newData);
+
 /**
  * @swagger
  * paths:
@@ -298,12 +324,10 @@ router.put("/update/single/data", updateApi.updateSingleData);
  */
 router.delete("/delete/single/data", deleteApi.deleteSingleData);
 
-
-router.post("/bulk/new-data/",upload.single("dataFile"), insertApi.newData);
 router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
-router.post("/search/partialSearch/:page/:perPage",searchAPI.partialSearch);
-router.get("/search/categorizeField",searchAPI.categorizeField);
-router.get("/index/mapping/:index",indexAPI.getMapping);
+router.post("/search/partialSearch/:page/:perPage", searchAPI.partialSearch);
+router.get("/search/categorizeField", searchAPI.categorizeField);
+router.get("/index/mapping/:index", indexAPI.getMapping);
 
 // router.post("/index/create/:index",indexAPI.createIndex);
 
