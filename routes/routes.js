@@ -93,7 +93,7 @@ router.get("/getAllIndex", getindicesData.getAllIndex);
 router.post("/bulk/data", upload.single("dataFile"), insertApi.bulkData);
 
 /**
- * @swagger
+ * swagger
  * /bulk/new-data:
  *   post:
  *     summary: Add new index with data.
@@ -120,16 +120,31 @@ router.post("/bulk/new-data", upload.single("dataFile"), insertApi.newData);
 /**
  * @swagger
  * paths:
- *   /search/alldata/{index}:
- *    get:
+ *   /search/partialSearch/{page}/{perPage}:
+ *    post:
  *      summary: Get all data of index
  *      parameters:
  *        - in: path
- *          name: index
+ *          name: page
  *          schema:
- *            type: string
+ *            type: number
  *            required: true
  *            description: index name
+ *        - in: path
+ *          name: perPage
+ *          schema:
+ *            type: number
+ *            required: true
+ *            description: index name
+ *      requestBody:
+ *        content:
+ *         application/json:
+ *           schema:
+ *               type: object
+ *               properties:
+ *                 index:
+ *                   type: string
+ *                   example: blog
  *      responses:
  *        200:
  *          description: Success
