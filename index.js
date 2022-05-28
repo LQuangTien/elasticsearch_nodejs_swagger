@@ -30,7 +30,6 @@ const elasticsearch = require("./db.js");
 const app = express();
 
 app.use(cors());
-app.options("*", cors());
 app.use(express.static("public"));
 
 // app.all('/*', function(req, res, next) {
